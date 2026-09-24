@@ -1,0 +1,74 @@
+<!-- Created by Erion Nezha — © 2026 All rights reserved -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>✈️ Airline Management System — Web Port</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0b0f14;color:#e6e6e6;font-family:'Consolas','Courier New',monospace;min-height:100vh;display:flex;flex-direction:column}
+header.top{background:linear-gradient(135deg,#101820,#1b2a3a);padding:18px 20px;text-align:center;border-bottom:2px solid #00d4ff33}
+header.top h1{font-size:1.25rem;color:#fff}
+header.top p{color:#9fb3c8;font-size:.82rem;margin-top:6px}
+.wrap{flex:1;max-width:900px;width:100%;margin:0 auto;padding:18px;display:flex;flex-direction:column}
+.term{background:#05070b;border:1px solid #00d4ff33;border-radius:10px;padding:16px;height:60vh;overflow-y:auto;white-space:pre-wrap;font-size:.92rem;line-height:1.6;color:#c8ffb0}
+.inrow{display:flex;align-items:center;gap:8px;margin-top:10px;background:#05070b;border:1px solid #00d4ff55;border-radius:8px;padding:10px 14px}
+.inrow .prompt{color:#00d4ff;font-weight:700}
+.inrow input{flex:1;background:transparent;border:none;outline:none;color:#fff;font-family:inherit;font-size:.95rem}
+footer{text-align:center;padding:14px;color:#5c6b7f;font-size:.85rem;border-top:1px solid #ffffff10}
+footer strong{color:#9fb3c8}
+</style>
+</head>
+<body>
+<header class="top"><h1>✈️ Airline Management System</h1><p>Web port of Menu.c — flight reservations, cancellations and passenger records.</p></header>
+<div class="wrap"><div class="term" id="term"></div>
+<div class="inrow"><span class="prompt">&rsaquo;</span><input id="inp" autocomplete="off" spellcheck="false" placeholder="Type here and press Enter…"></div></div>
+<footer>Krijuar nga <strong>Erion Nezha</strong> — © 2026</footer>
+<script>
+const termEl=document.getElementById('term'),inp=document.getElementById('inp');
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function print(t){termEl.innerHTML+=esc(t)+'\n';termEl.scrollTop=termEl.scrollHeight;}
+function ask(q){return new Promise(function(res){print(q);inp.focus();function h(e){if(e.key==='Enter'){inp.removeEventListener('keydown',h);var v=inp.value;inp.value='';print('> '+v);res(v.trim());}}inp.addEventListener('keydown',h);});}
+function pause(){return new Promise(function(r){setTimeout(r,250);});}
+window.addEventListener('load',function(){main();});
+
+var records=[], seatNo=0;
+async function main(){
+  print('********************************************************************');
+  print('                   welcome to Airline system');
+  print('*******************************************************************');
+  while(true){
+    print('\n\n Please enter your choice from below (1-4):');
+    print('\n 1. Reservation\n\n 2. Cancel\n\n 3. DISPLAY RECORDS\n\n 4. EXIT');
+    print('\n feel free to contact');
+    var ch=await ask('\n Enter your choice :');
+    if(ch==='1'){
+      if(seatNo>=40){print('\n\t Seat Full.');continue;}
+      var passport=await ask('\n\t Enter your passport number:');
+      var name=await ask('\n\t Enter your  name:');
+      var email=await ask('\n\t Enter your email address:');
+      var dest=await ask('\n\t Enter the Destination : ');
+      seatNo++;
+      records.push({passport:passport,name:name,email:email,destination:dest,seat:'A-'+seatNo});
+      print('\n\t Seat booking successful!');
+      print('\n\t your seat number is: Seat A-'+seatNo);
+      print('\n\n\t Details have been saved.');
+    }else if(ch==='2'){
+      var p=await ask('\n\t Enter passport number to cancel:');
+      var i=records.findIndex(function(r){return r.passport===p;});
+      if(i<0){print('\n\t Record not found.');continue;}
+      records.splice(i,1);
+      print('\n\t Reservation cancelled for passport '+p+'.');
+    }else if(ch==='3'){
+      if(!records.length){print('\n\t No records found.');continue;}
+      print('\n\t --- Passenger Records ---');
+      records.forEach(function(r){
+        print('\n Passport Number : '+r.passport+'\n Name : '+r.name+'\n Email : '+r.email+'\n Destination : '+r.destination+'\n Seat : '+r.seat+'\n -------------------------');});
+    }else if(ch==='4'){print('\n\t Thank you for using the Airline system. Goodbye!');break;
+    }else{print('\n\n\t SORRY INVALID CHOICE!\n\n\t PLEASE CHOOSE FROM 1-4');}
+  }
+}
+</script>
+</body>
+</html>
